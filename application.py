@@ -19,19 +19,54 @@ application = Flask('CatalogService')
 def health_check():
     return render_template('index.html')
 
-@application.route("/tutors", methods=["GET"])
-def tutors():
-    params = request.args
+@application.route('/tutors', defaults={'page':1})
+@application.route("/tutors/page/<int:page>", methods=["GET"])
+def tutors(page):
+    params = request.args.copy()
     fields = params.get('fields','*')
-    data = td.get_all_tutors_data(params=params, fields=fields)
+    limit = params.get('limit',10)
+    data = td.get_tutor(params=params, fields=fields, paginate=True, page=page, limit=limit, url=request.url_root)
     rsp = Response(json.dumps(data), status=200, content_type="application/json")
     return rsp
 
-@application.route("/tutors/add", methods=["GET"])
+@application.route("/tutors/profile/<username>", methods=["GET"])
+def tutors_by_username(username):
+    params = request.args.copy()
+    fields = params.get('fields','*')
+    custParams = {k:v for k,v in params.items()}
+    custParams['username']=username
+    data = td.get_tutor(params=custParams, fields=fields)
+    rsp = Response(json.dumps(data), status=200, content_type="application/json")
+    return rsp
+
+@application.route("/tutors/add", methods=["POST"])
 def tutors_add():
-    params = request.args
+    params = request.args.copy()
     try:
         data = td.add_tutor(params=params)
+        rsp = Response(json.dumps(data), status=200, content_type="application/json")
+    except Exception as e:
+        print('Error:',e)
+        rsp = Response('Error: {}'.format(str(e)), status=400)
+    return rsp
+
+@application.route("/tutors/delete/<usrEmail>", methods=["POST"])
+def tutors_delete(usrEmail):
+    email = True if '@' in usrEmail else False
+    try:
+        data = td.delete_tutor(usrEmail,email)
+        rsp = Response(json.dumps(data), status=200, content_type="application/json")
+    except Exception as e:
+        print('Error:',e)
+        rsp = Response('Error: {}'.format(str(e)), status=400)
+    return rsp
+
+@application.route("/tutors/update/<usrEmail>", methods=["POST"])
+def tutors_update(usrEmail):
+    email = True if '@' in usrEmail else False
+    params = request.args.copy()
+    try:
+        data = td.update_tutor(usrEmail,email, params)
         rsp = Response(json.dumps(data), status=200, content_type="application/json")
     except Exception as e:
         print('Error:',e)
