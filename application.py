@@ -39,7 +39,7 @@ def tutors_by_username(username):
     rsp = Response(json.dumps(data), status=200, content_type="application/json")
     return rsp
 
-@application.route("/tutors/add", methods=["POST"])
+@application.route("/tutors/add", methods=["GET"])
 def tutors_add():
     params = request.args.copy()
     try:
@@ -50,7 +50,7 @@ def tutors_add():
         rsp = Response('Error: {}'.format(str(e)), status=400)
     return rsp
 
-@application.route("/tutors/delete/<usrEmail>", methods=["POST"])
+@application.route("/tutors/delete/<usrEmail>", methods=["GET"])
 def tutors_delete(usrEmail):
     email = True if '@' in usrEmail else False
     try:
@@ -61,7 +61,7 @@ def tutors_delete(usrEmail):
         rsp = Response('Error: {}'.format(str(e)), status=400)
     return rsp
 
-@application.route("/tutors/update/<usrEmail>", methods=["POST"])
+@application.route("/tutors/update/<usrEmail>", methods=["GET"])
 def tutors_update(usrEmail):
     email = True if '@' in usrEmail else False
     params = request.args.copy()
