@@ -19,23 +19,46 @@ application = Flask('CatalogService')
 def health_check():
     return render_template('index.html')
 
-@application.route('/tutors', defaults={'page':1})
-@application.route("/tutors/page/<int:page>", methods=["GET"])
-def tutors(page):
-    params = request.args.copy()
-    fields = params.get('fields','*')
-    limit = params.get('limit',10)
-    data = td.get_tutor(params=params, fields=fields, paginate=True, page=page, limit=limit, url=request.url_root)
+@application.route('/catalog')
+def catalog():
+    data = td.get_catalog(url=request.url_root)
     rsp = Response(json.dumps(data), status=200, content_type="application/json")
     return rsp
 
-@application.route("/tutors/profile/<username>", methods=["GET"])
-def tutors_by_username(username):
+@application.route("/categories", methods=["GET"])
+def catagories():
     params = request.args.copy()
-    fields = params.get('fields','*')
+    fields = params.get('fields', '*')
+    limit, offset = int(params.get('limit', 10)), int(params.get('offset', 0))
     custParams = {k:v for k,v in params.items()}
-    custParams['username']=username
-    data = td.get_tutor(params=custParams, fields=fields)
+    data = td.get_categories(params=custParams, fields=fields, limit=limit, offset=offset, url=request.url_root)
+    rsp = Response(json.dumps(data), status=200, content_type="application/json")
+    return rsp
+
+@application.route("/categories/<idCategories>", methods=["GET"])
+def catagories_id(idCategories):
+    params = request.args.copy()
+    fields = params.get('fields', '*')
+    limit, offset = int(params.get('limit', 10)), int(params.get('offset', 0))
+    custParams = {k:v for k,v in params.items()}
+    data = td.get_categories_by_id(idCategories=idCategories, params=custParams, fields=fields, limit=limit, offset=offset, url=request.url_root)
+    rsp = Response(json.dumps(data), status=200, content_type="application/json")
+    return rsp
+
+@application.route("/tutors", methods=["GET"])
+def tutors():
+    params = request.args.copy()
+    limit, offset = int(params.get('limit', 10)), int(params.get('offset', 0))
+    custParams = {k:v for k,v in params.items()}
+    data = td.get_tutors(params=custParams, limit=limit, offset=offset, url=request.url_root)
+    rsp = Response(json.dumps(data), status=200, content_type="application/json")
+    return rsp
+
+@application.route("/tutors/<idTutors>", methods=["GET"])
+def tutors_id(idTutors):
+    params = request.args.copy()
+    custParams = {k:v for k,v in params.items()}
+    data = td.get_tutors_by_id(idTutors=idTutors, params=custParams, url=request.url_root)
     rsp = Response(json.dumps(data), status=200, content_type="application/json")
     return rsp
 

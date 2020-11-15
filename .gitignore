@@ -1,1 +1,5 @@
 env_var.sh
+**/.DS_Store
+**/__pycache__
+rough.py
+data.json
