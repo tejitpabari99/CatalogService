@@ -45,12 +45,13 @@ class tutorsDatabase(object):
         data['data'][0]['categories'] = data['data'][0]['categories'].split(',')
         return data
 
-    def add_tutor(self, params, url=''):
+    def add_tutor(self, idTutors, params, url=''):
+        print(idTutors, params)
         custParams = params.copy()
         for col in self.key_columns:
             if col not in custParams:
                 raise Exception('Tutors add must have columns {}'.format(self.key_columns))
-
+        custParams['idTutors'] = idTutors
         categories = custParams.get('categories').split(',')
         del custParams['categories']
 

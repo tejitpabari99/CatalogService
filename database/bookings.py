@@ -41,8 +41,9 @@ class bookingsDatabase(object):
         data['data'] = convert_datetime_str(data['data'], cols=['meetingDate', 'bookingDate'])
         return data
 
-    def add_bookings(self, idTutors, params=None, url=''):
+    def add_bookings(self, idTutors, idProfile, params=None, url=''):
         custParams = params.copy()
+        custParams['idProfile']=idProfile
         custParams['idTutors'] = idTutors
         for col in self.key_columns:
             if col not in custParams:
