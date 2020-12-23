@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+import jwt
 
 from flask import Flask, Response
 from flask import request
@@ -25,6 +26,17 @@ application = Flask('CatalogService')
 
 def response400(e):
     return Response('Error: {}'.format(str(e)), status=400)
+
+def decode_auth_token(auth_token):
+    try:
+        payload = jwt.decode(auth_token, os.environ.get('SECRET_KEY'))
+        return payload['sub']
+    except jwt.ExpiredSignatureError:
+        return 'Signature expired. Please log in again.'
+    except jwt.InvalidTokenError:
+        return 'Invalid token. Please log in again.'
+
+# def handle_auth_token(headers,params):
 
 # This function performs a basic health check. We will flesh this out.
 @application.route("/", methods=["GET"])
@@ -162,7 +174,7 @@ def tutors_book(idTutors):
     try:
         data = bookingsD.add_bookings(idTutors, params=request.json)
         rsp = response400('Error in data addition')
-        if data: rsp = Response('Booking Added. The tutor will reply with an email confirmation.', status=200, content_type="application/txt")
+        if data: rsp = Response('Booking Added. An email has been sent to the tutor.', status=200, content_type="application/txt")
     except Exception as e:
         print('Error:', e)
         rsp = response400(e)
