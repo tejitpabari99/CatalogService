@@ -117,8 +117,8 @@ def tutors_id(idTutors):
 def tutors_add():
     authToken = handle_auth_token(request.headers, request.args)
     try:
-        print(authToken)
         idTutors = decode_auth_token(authToken)
+        print(idTutors)
         data = tutorD.add_tutor(idTutors=idTutors, params=request.json)
         rsp = response400('Error in data addition')
         if data: rsp = Response('Added', status=200, content_type="application/txt")

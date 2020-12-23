@@ -46,7 +46,6 @@ class tutorsDatabase(object):
         return data
 
     def add_tutor(self, idTutors, params, url=''):
-        print(idTutors, params)
         custParams = params.copy()
         for col in self.key_columns:
             if col not in custParams:
@@ -56,7 +55,6 @@ class tutorsDatabase(object):
         del custParams['categories']
 
         data = add_db(self.cnx, 'tutors', custParams)
-        idTutors = get_last_id(self.cnx)
         catalogAdd = [{'idTutors':idTutors, 'idCategories':c} for c in categories]
         data2 = add_db(self.cnx, 'catalog', catalogAdd)
 
