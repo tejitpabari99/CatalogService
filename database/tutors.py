@@ -42,7 +42,8 @@ class tutorsDatabase(object):
                 catalog
                 using(idTutors)) as a"""
         data = get_from_db(cnx=self.cnx, q=query, params=custParams, paginate=False, url=url, notIncludedCols = self.notIncludedCols)
-        if data['data'] and data['data'][0] and data['data'][0]['categories'].strip():
+        print(data)
+        if data['data'] and data['data'][0] and data['data'][0]['categories']:
             data['data'][0]['categories'] = data['data'][0]['categories'].split(',')
         return data
 
