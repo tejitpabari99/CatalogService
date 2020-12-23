@@ -104,7 +104,7 @@ def tutors_id(idTutors):
         data['links'] = {'bookings': request.url_root+'tutors/'+str(idTutors)+'/bookings',
                          'book': request.url_root + 'tutors/' + str(idTutors) + '/book'}
         commentData = requests.get('https://api.learnndonate.com/dev/comments', data={'email':'lallcockds@google.pl'},
-                                    headers={'authorization': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWQiOjEsInJvbGUiOiJhZG1pbiJ9.VoVP7vG3poRztX-jtooMnLcpEvhEqGCVx98w79qcJf4'})
+                                    headers={'authorization': authToken})
         data['comments'] = commentData.json()
         rsp = Response(json.dumps(data), status=200, content_type="application/json")
     except Exception as e:
