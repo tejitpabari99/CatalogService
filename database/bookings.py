@@ -1,4 +1,5 @@
 import datetime
+import requests
 
 from database.database import database
 from database.functions import _parse_params, _paginateDict, _make_id_link, \
@@ -13,15 +14,14 @@ class bookingsDatabase(object):
             db = database(host=host, db=db, user=user, password=password)
             self.cnx = db.cnx
         self.key_columns, self.notIncludedCols = key_columns, notIncludedCols
-        if not key_columns: self.key_columns = ['idTutors', 'idProfile', 'meetingDate', 'bookingDate', 'idCategories', 'meetingTime']
+        if not key_columns: self.key_columns = ['idTutors', 'meetingDate', 'bookingDate', 'idCategories', 'meetingTime',
+                                                'imageLink', 'tuteeName', 'tuteeEmail']
         if not notIncludedCols: self.notIncludedCols = ['fields', 'limit', 'offset', 'idTutors']
 
 
-    def get_bookings(self, idTutors='', idProfile='', params=None, url=''):
-        if not idTutors and not idProfile: raise Exception('No idTutors or idProfile')
+    def get_bookings(self, idTutors, params=None, url=''):
         custParams = params.copy()
-        if idTutors: custParams['idTutors'] = idTutors
-        elif idProfile: custParams['idProfile'] = idProfile
+        custParams['idTutors'] = idTutors
         limit, offset = int(custParams.get('limit', 10)), int(custParams.get('offset', 0))
         custUrl = url + 'tutors/'+str(idTutors)+'/bookings'
         data = get_from_db(cnx=self.cnx, table='bookings', params=custParams,
@@ -31,11 +31,10 @@ class bookingsDatabase(object):
         data['data'] = convert_datetime_str(data['data'], cols=['meetingDate', 'bookingDate'])
         return data
 
-    def get_bookings_id(self, idBookings, idTutors='', idProfile='', params=None, url=''):
-        if not idTutors and not idProfile: raise Exception('No idTutors or idProfile')
-        custParams = params.copy()
-        if idTutors: custParams['idTutors'] = idTutors
-        elif idProfile: custParams['idProfile'] = idProfile
+    def get_bookings_id(self, idBookings, idTutors, params=None, url=''):
+        if params: custParams = params.copy()
+        else: custParams = {}
+        custParams['idTutors'] = idTutors
         custParams['idBookings']=idBookings
         data = get_from_db(cnx=self.cnx, table='bookings', params=custParams,
                            paginate=False, url=url, notIncludedCols=self.notIncludedCols)
@@ -44,9 +43,29 @@ class bookingsDatabase(object):
 
     def add_bookings(self, idTutors, params=None, url=''):
         custParams = params.copy()
-        custParams['']
+        custParams['idTutors'] = idTutors
         for col in self.key_columns:
             if col not in custParams:
                 raise Exception('Bookings add must have columns {}'.format(self.key_columns))
+        data = add_db(self.cnx, 'bookings', custParams)
+        idBookings = get_last_id(self.cnx)
+        custParams['idBookings'] = idBookings
+        custParams['token'] = "sfsdfsdfsadfdsf"
+        r = requests.post('https://ux5wwtq0bl.execute-api.us-east-2.amazonaws.com/default/approveBooking', params=custParams)
+        return True
+
+    # def approve_bookings(self, idBookings, idTutors, params=None, url=''):
+    #     checkParams = {}
+    #     checkParams['idTutors'] = idTutors
+    #     checkParams['idBookings'] = idBookings
+    #     data = update_db(self.cnx, 'bookings', checkParams=checkParams, addParams={'meetingStatus':'APPROVED'})
+    #     return self.get_bookings_id(idBookings,idTutors)
+    #
+    # def reject_bookings(self, idBookings, idTutors, params=None, url=''):
+    #     checkParams = {}
+    #     checkParams['idTutors'] = idTutors
+    #     checkParams['idBookings'] = idBookings
+    #     data = update_db(self.cnx, 'bookings', checkParams=checkParams, addParams={'meetingStatus':'CANCELLED'})
+    #     return self.get_bookings_id(idBookings,idTutors)
 
 

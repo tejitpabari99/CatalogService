@@ -75,6 +75,9 @@ def tutors():
 def tutors_id(idTutors):
     try:
         data = tutorD.get_tutors_by_id(idTutors=idTutors, url=request.url_root)
+        data['links'] = {'bookings': request.url_root+'tutors/'+str(idTutors)+'/bookings',
+                         'book': request.url_root + 'tutors/' + str(idTutors) + '/book',
+                         'comments': request.url_root+'tutors/'+str(idTutors)+'/comments'}
         rsp = Response(json.dumps(data), status=200, content_type="application/json")
     except Exception as e:
         print('Error:', e)
@@ -133,10 +136,37 @@ def tutors_bookings_id(idTutors,idBookings):
         print('Error:', e)
         rsp = response400(e)
     return rsp
+#
+# @application.route("/tutors/<idTutors>/bookings/<idBookings>/approve", methods=["GET"])
+# def tutors_bookings_id_approve(idTutors,idBookings):
+#     try:
+#         data = bookingsD.approve_bookings(idBookings=idBookings, idTutors=idTutors, url=request.url_root)
+#         rsp = Response(json.dumps(data), status=200, content_type="application/json")
+#     except Exception as e:
+#         print('Error:', e)
+#         rsp = response400(e)
+#     return rsp
+#
+# @application.route("/tutors/<idTutors>/bookings/<idBookings>/reject", methods=["GET"])
+# def tutors_bookings_id_reject(idTutors,idBookings):
+#     try:
+#         data = bookingsD.reject_bookings(idBookings=idBookings, idTutors=idTutors, url=request.url_root)
+#         rsp = Response(json.dumps(data), status=200, content_type="application/json")
+#     except Exception as e:
+#         print('Error:', e)
+#         rsp = response400(e)
+#     return rsp
 
-@application.route("/tutors/<idTutors>/book", methods=["GET"])
+@application.route("/tutors/<idTutors>/book", methods=["POST"])
 def tutors_book(idTutors):
-    pass
+    try:
+        data = bookingsD.add_bookings(idTutors, params=request.json)
+        rsp = response400('Error in data addition')
+        if data: rsp = Response('Booking Added. The tutor will reply with an email confirmation.', status=200, content_type="application/txt")
+    except Exception as e:
+        print('Error:', e)
+        rsp = response400(e)
+    return rsp
 
 if __name__ == "__main__":
     application.run(debug=True)
