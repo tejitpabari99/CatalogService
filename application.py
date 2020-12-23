@@ -101,12 +101,15 @@ def tutors_id(idTutors):
     authToken = handle_auth_token(request.headers, request.args)
     try:
         data = tutorD.get_tutors_by_id(idTutors=idTutors, url=request.url_root)
-        data['links'] = {'bookings': request.url_root+'tutors/'+str(idTutors)+'/bookings',
-                         'book': request.url_root + 'tutors/' + str(idTutors) + '/book'}
-        commentData = requests.get('https://api.learnndonate.com/dev/comments', data={'email':'lallcockds@google.pl'},
-                                    headers={'authorization': authToken})
-        data['comments'] = commentData.json()
-        rsp = Response(json.dumps(data), status=200, content_type="application/json")
+        if not data['data'] or not data['data'][0]['idTutors']:
+            rsp = Response('No Tutor found', status=402, content_type="application/txt")
+        else:
+            data['links'] = {'bookings': request.url_root+'tutors/'+str(idTutors)+'/bookings',
+                            'book': request.url_root + 'tutors/' + str(idTutors) + '/book'}
+            commentData = requests.get('https://api.learnndonate.com/dev/comments', data={'email':'lallcockds@google.pl'},
+                                        headers={'authorization': authToken})
+            data['comments'] = commentData.json()
+            rsp = Response(json.dumps(data), status=200, content_type="application/json")
     except Exception as e:
         print('Error:', e)
         rsp = response400(e)
