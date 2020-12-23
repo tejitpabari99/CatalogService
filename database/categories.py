@@ -17,7 +17,7 @@ class categoriesDatabase(object):
     def get_categories(self, params=None, url=''):
         limit, offset = int(params.get('limit', 10)), int(params.get('offset', 0))
         fields = params.get('fields', '*')
-        custParams = params.copy()
+        custParams = {k:v for k,v in params.items()}
         data = get_from_db(cnx=self.cnx, table='categories', params=custParams, fields=fields,
                                 paginate=True, limit=limit, offset=offset, url=url, notIncludedCols = self.notIncludedCols)
         data['data'] = _make_id_link(data['data'], url=url + 'categories/{}', key='idCategories')
@@ -26,7 +26,7 @@ class categoriesDatabase(object):
     def get_categories_by_id(self, idCategories, params=None, url=''):
         limit, offset = int(params.get('limit', 10)), int(params.get('offset', 0))
         fields = params.get('fields', '*')
-        custParams = params.copy()
+        custParams = {k:v for k,v in params.items()}
         query = """
                 SELECT catalog.idTutors as idTutors, name, byline, linkedin, resume, website, imageLink
                 FROM catalog JOIN tutors

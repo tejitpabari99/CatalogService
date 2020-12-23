@@ -16,14 +16,15 @@ class bookingsDatabase(object):
         self.key_columns, self.notIncludedCols = key_columns, notIncludedCols
         if not key_columns: self.key_columns = ['idTutors', 'meetingDate', 'bookingDate', 'idCategories', 'meetingTime',
                                                 'imageLink', 'tuteeName', 'tuteeEmail']
-        if not notIncludedCols: self.notIncludedCols = ['fields', 'limit', 'offset', 'idTutors']
+        if not notIncludedCols: self.notIncludedCols = ['fields', 'limit', 'offset']
 
 
     def get_bookings(self, idTutors, params=None, url=''):
-        custParams = params.copy()
+        custParams = {k:v for k,v in params.items()}
         custParams['idTutors'] = idTutors
         limit, offset = int(custParams.get('limit', 10)), int(custParams.get('offset', 0))
         custUrl = url + 'tutors/'+str(idTutors)+'/bookings'
+        print(custParams)
         data = get_from_db(cnx=self.cnx, table='bookings', params=custParams,
                            paginate=True, limit=limit, offset=offset, url=url,
                            custUrl=custUrl, notIncludedCols=self.notIncludedCols, urlNotIncludedCols=['idTutors', 'idProfile'])
@@ -32,7 +33,7 @@ class bookingsDatabase(object):
         return data
 
     def get_bookings_id(self, idBookings, idTutors, params=None, url=''):
-        if params: custParams = params.copy()
+        if params: custParams = {k:v for k,v in params.items()}
         else: custParams = {}
         custParams['idTutors'] = idTutors
         custParams['idBookings']=idBookings
@@ -42,7 +43,7 @@ class bookingsDatabase(object):
         return data
 
     def add_bookings(self, idTutors, idProfile, params=None, url=''):
-        custParams = params.copy()
+        custParams = custParams = {k:v for k,v in params.items()}
         custParams['idProfile']=idProfile
         custParams['idTutors'] = idTutors
         for col in self.key_columns:

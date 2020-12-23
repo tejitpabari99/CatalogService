@@ -14,7 +14,7 @@ class tutorsDatabase(object):
         if not notIncludedCols: self.notIncludedCols = ['fields', 'limit', 'offset']
 
     def get_tutors(self, params=None, url=''):
-        custParams = params.copy()
+        custParams = {k:v for k,v in params.items()}
         query = """select idTutors, name, byline, linkedin, website, imageLink, group_concat(category_name) as categories from
             (select idTutors, name, byline, linkedin, resume, website, imageLink, idCategories,
                 (select category from categories where catalog.idCategories=categories.idCategories) as category_name
@@ -47,7 +47,7 @@ class tutorsDatabase(object):
         return data
 
     def add_tutor(self, idTutors, params, url=''):
-        custParams = params.copy()
+        custParams = {k:v for k,v in params.items()}
         for col in self.key_columns:
             if col not in custParams:
                 raise Exception('Tutors add must have columns {}'.format(self.key_columns))
@@ -69,7 +69,7 @@ class tutorsDatabase(object):
 
     def update_tutor(self, idTutors, params, url=''):
         checkParams = {'idTutors':idTutors}
-        addParams = params.copy()
+        addParams = {k:v for k,v in params.items()}
         if "categories" in addParams:
             categories = addParams.get('categories').split(',')
             del addParams['categories']

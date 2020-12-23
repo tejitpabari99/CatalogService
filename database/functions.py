@@ -61,6 +61,7 @@ def get_from_db(cnx, table='', q=None, params=None, fields='*', paginate=False, 
             for c in urlNotIncludedCols:
                 if c in custParams: del custParams[c]
         data = _paginateDict(data, url, params=custParams, limit=limit, offset=offset)
+    print(query)
     return data
 
 def get_last_id(cnx):
